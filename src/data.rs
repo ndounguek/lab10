@@ -151,16 +151,3 @@ pub fn load_scores(_path: &str) -> Vec<ScoreRecord> {
     todo!("Task 7: load_scores")
 }
 
-// TEMPORARY: lets the game run before load_fleet works.
-// Task 5 replaces the call in main.rs; then delete this function.
-pub fn default_fleet() -> Vec<ShipSpec> {
-    let lengths = [5, 4, 3, 3, 2];
-    let mut fleet = Vec::new();
-    for length in lengths {
-        fleet.push(ShipSpec {
-            name: format!("Ship{length}"),
-            length,
-        });
-    }
-    fleet
-}

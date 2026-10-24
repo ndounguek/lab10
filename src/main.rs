@@ -10,9 +10,7 @@ const FLEET_PATH: &str = "data/fleet.txt";
 const TOP_N: usize = 5;
 
 fn main() {
-    // TODO (Task 5): replace default_fleet() with data::load_fleet(FLEET_PATH),
-    // then delete default_fleet from data.rs.
-    let fleet = data::default_fleet();
+   let fleet = data::load_fleet(FLEET_PATH);
     if fleet.is_empty() {
         println!("No fleet loaded. Check {FLEET_PATH}.");
         return;
