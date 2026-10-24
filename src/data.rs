@@ -1,6 +1,8 @@
 // Loading and saving game data.
 use crate::board::Board;
 use std::fs;
+use std::fs::OpenOptions;
+use std::io::Write;
 pub const MIN_SHIP: usize = 2;
 pub const MAX_SHIP: usize = 5;
 
@@ -139,15 +141,38 @@ pub fn load_board(_path: &str) -> Option<Board> {
 // Replace commas in the name with spaces so the line stays parseable.
 // Return true if the write succeeded; on failure print the error to stderr
 // and return false.
-pub fn append_score(_path: &str, _record: &ScoreRecord) -> bool {
-    todo!("Task 6: append_score")
+pub fn append_score(path: &str, record: &ScoreRecord) -> bool {
+    let name = record.name.replace(',', " ");
+    let file = OpenOptions::new().create(true).append(true).open(path);
+    match file {
+        Ok(mut f) => match writeln!(f, "{},{}", name, record.score) {
+            Ok(_) => true,
+            Err(e) => {
+                eprintln!("{}", e);
+                false
+            }
+        },
+        Err(e) => {
+            eprintln!("{}", e);
+            false
+        }
+    }
 }
-
 // Task 7.
 // Read every valid score line from path. A missing file is normal on the
 // first run: return an empty Vec and print nothing. Skip lines that
 // parse_score rejects.
-pub fn load_scores(_path: &str) -> Vec<ScoreRecord> {
-    todo!("Task 7: load_scores")
+pub fn load_scores(path: &str) -> Vec<ScoreRecord> {
+    let text = match fs::read_to_string(path) {
+        Ok(text) => text,
+        Err(_) => return Vec::new(),
+    };
+    let mut records = Vec::new();
+    for line in text.lines() {
+        match parse_score(line) {
+            Some(record) => records.push(record),
+            None => {}
+        }
+    }
+    records
 }
-
