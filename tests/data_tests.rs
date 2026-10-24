@@ -73,3 +73,31 @@ fn parse_score_valid() {
 // 2. parse_ship_line returns None when the length is not a number ("Dinghy,x").
 // 3. parse_board returns None when there are only nine rows. Write the nine
 //    rows as a string literal like GOOD_BOARD, with one row removed.
+
+#[test]
+fn parse_ship_line_rejects_empty_name() {
+    assert!(battleship::data::parse_ship_line(",5").is_none());
+}
+
+#[test]
+fn parse_board_rejects_too_few_rows() {
+    let text = "SSSSS.....\n..........\n";
+    assert!(battleship::data::parse_board(text).is_none());
+}
+
+#[test]
+fn append_score_then_load_scores_round_trip() {
+    let path = std::env::temp_dir().join("battleship_test_scores.txt");
+    let path = path.to_str().unwrap();
+    let _ = std::fs::remove_file(path);
+    let record = battleship::data::ScoreRecord {
+        name: String::from("Bo,b"),
+        score: 83,
+    };
+    assert!(battleship::data::append_score(path, &record));
+    let loaded = battleship::data::load_scores(path);
+    assert_eq!(loaded.len(), 1);
+    assert_eq!(loaded[0].name, "Bo b");
+    assert_eq!(loaded[0].score, 83);
+    let _ = std::fs::remove_file(path);
+}
