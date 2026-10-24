@@ -1,5 +1,5 @@
 // Loading and saving game data.
-use crate::board::Board;
+use crate::board::{Board, Cell, SIZE, new_board};
 use std::fs;
 use std::fs::OpenOptions;
 use std::io::Write;
@@ -125,17 +125,54 @@ pub fn load_fleet(path: &str) -> Vec<ShipSpec> {
 // starting with '#' are ignored. Return None for too few rows, too many rows,
 // a row of the wrong width, or any other character.
 // Start from board::new_board() and fill in board[row][col].
-pub fn parse_board(_text: &str) -> Option<Board> {
-    todo!("Task 3: parse_board")
+pub fn parse_board(text: &str) -> Option<Board> {
+    let mut board = new_board();
+    let mut row = 0;
+    for line in text.lines() {
+        let line = line.trim();
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        if row >= SIZE {
+            return None;
+        }
+        let chars: Vec<char> = line.chars().collect();
+        if chars.len() != SIZE {
+            return None;
+        }
+        for col in 0..SIZE {
+            match chars[col] {
+                '.' => board[row][col] = Cell::Water,
+                'S' => board[row][col] = Cell::Ship,
+                _ => return None,
+            }
+        }
+        row += 1;
+    }
+    if row != SIZE {
+        return None;
+    }
+    Some(board)
 }
-
 // Task 4.
 // Read the file at path and parse it with parse_board. On a read error, or if
 // parse_board returns None, print a message to stderr and return None.
-pub fn load_board(_path: &str) -> Option<Board> {
-    todo!("Task 4: load_board")
+pub fn load_board(path: &str) -> Option<Board> {
+    let text = match fs::read_to_string(path) {
+        Ok(text) => text,
+        Err(e) => {
+            eprintln!("{}", e);
+            return None;
+        }
+    };
+    match parse_board(&text) {
+        Some(board) => Some(board),
+        None => {
+            eprintln!("{} is not a valid board file", path);
+            None
+        }
+    }
 }
-
 // Task 6.
 // Append "name,score" as one line to path, creating the file if needed.
 // Replace commas in the name with spaces so the line stays parseable.
