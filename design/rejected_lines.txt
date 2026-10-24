@@ -1,0 +1,3 @@
+Line 10: "Tugboat,1" was rejected because the length 1 is below MIN_SHIP (2).
+Line 11: "Dinghy,x" was  rejected because the length is not a number.
+Line 12: "Flagship" was  rejected because it has no comma.
